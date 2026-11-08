@@ -1,0 +1,21 @@
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>معرض الشخصيات والملابس</title><body style="margin:0;background:#15131f;color:#eee;font-family:sans-serif">
+<p id="msg" style="padding:12px;margin:0">جارٍ التحميل…</p><div id="c"></div>
+<script src="three.min.js"></script><script src="GLTFLoader.js"></script><script src="wardrobe.js"></script><script>
+const W=Math.min(innerWidth,900),H=Math.round(W*0.62),R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio||1,1.5));R.setSize(W,H);
+R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;document.getElementById("c").appendChild(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color(0x8a7a8e);S.add(new THREE.HemisphereLight(0xffe0c0,0x443344,1.1));
+const L=new THREE.DirectionalLight(0xffd0a0,2.2);L.position.set(-3,5,4);S.add(L);
+const fl=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.MeshStandardMaterial({color:0x6b5a50,roughness:1}));fl.rotation.x=-Math.PI/2;S.add(fl);
+const cam=new THREE.PerspectiveCamera(32,W/H,.1,100);cam.position.set(0,1.4,9);cam.lookAt(0,.95,0);
+const ld=new THREE.GLTFLoader(),mx=[],P=u=>new Promise((r,e)=>ld.load(u,r,undefined,e));
+(async()=>{try{const an=await P("anim.glb"),clip=n=>an.animations.find(a=>a.name===n);
+ const mk=async(u,x,c,rot)=>{const g=await P(u),m=g.scene;m.position.x=x;m.rotation.y=rot;S.add(m);m.traverse(o=>{if(o.isMesh)o.frustumCulled=false});
+  const q=new THREE.AnimationMixer(m);q.clipAction(clip(c)).play();mx.push(q);return m};
+ const A=await mk("ch_man.glb",-1.9,"Idle_Talking_Loop",0.3);Wardrobe.wear(A,"modern",{top:0x2e6fd0,bottom:0x2a3b66});await Wardrobe.bindParts(A,["hr_hair_simpleparted.glb","hr_eyebrows_regular.glb"],ld,0x2b1d14);
+ const B=await mk("ch_woman.glb",0,"Walk_Loop",0);Wardrobe.wear(B,"modern",{top:0xd9507a,bottom:0x3a4660}); await Wardrobe.bindParts(B,["hr_hair_long.glb","hr_eyebrows_female.glb"],ld,0x5a3a22);
+ const C=await mk("ch_man.glb",1.9,"Idle_Talking_Loop",-0.3);Wardrobe.wear(C,"aladdin",{});Wardrobe.turban(C,0xf4efe6);await Wardrobe.bindParts(C,["hr_hair_beard.glb","hr_eyebrows_regular.glb"],ld,0x15100c);
+ document.getElementById("msg").textContent="✓ رجل (لبس عصري) · سيدة (لبس عصري) · رجل (لبس علاء الدين) — الحركات من مكتبة Universal Animation.";
+}catch(e){document.getElementById("msg").textContent="خطأ: "+e+" — تأكد من رفع كل الملفات بجانب الصفحة."}})();
+const ck=new THREE.Clock();(function f(){requestAnimationFrame(f);const d=ck.getDelta();mx.forEach(m=>m.update(d));R.render(S,cam)})();
+</script></html>
